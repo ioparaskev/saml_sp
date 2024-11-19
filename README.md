@@ -41,3 +41,5 @@ Run the SP server with optional HTTPS certificates path and port:
 ```
 python app.py --cert certs/http/https_cert.pem --key certs/http/https_key.pem --port 9443
 ```
+
+Visit <entityid>/login to login and see the returned SAML attributes
