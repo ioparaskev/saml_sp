@@ -45,6 +45,16 @@ def update_sp_urls(entity_id, nameid_format):
     }
 
 
+def get_default_settings():
+    """Return default settings structure"""
+    return {
+        "strict": True,
+        "debug": True,
+        "sp": {},
+        "idp": {}
+    }
+
+
 def update_settings_json(
     cert_content=None,
     key_content=None,
@@ -52,20 +62,28 @@ def update_settings_json(
     nameid_format=None,
     settings_file="settings.json",
 ):
-    with open(settings_file, "r") as f:
-        settings = json.load(f)
-
+    # Create or load settings
+    if not os.path.exists(settings_file):
+        settings = get_default_settings()
+    else:
+        with open(settings_file, "r") as f:
+            settings = json.load(f)
+    
+    # Ensure sp section exists
+    if "sp" not in settings:
+        settings["sp"] = {}
+    
+    # Update SP settings
     if cert_content and key_content:
         settings["sp"]["x509cert"] = cert_content
         settings["sp"]["privateKey"] = key_content
-
+    
     if entity_id:
         sp_urls = update_sp_urls(entity_id, nameid_format)
         settings["sp"].update(sp_urls)
-
-    if nameid_format:
+    elif nameid_format:
         settings["sp"]["NameIDFormat"] = nameid_format
-
+    
     # Write back to file with proper formatting
     with open(settings_file, "w") as f:
         json.dump(settings, f, indent=4)

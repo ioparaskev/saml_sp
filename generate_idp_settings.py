@@ -2,6 +2,7 @@ import argparse
 import json
 from onelogin.saml2.idp_metadata_parser import OneLogin_Saml2_IdPMetadataParser
 import requests
+import os
 
 
 def load_metadata_from_file(file_path):
@@ -15,9 +16,23 @@ def load_metadata_from_url(url):
     return response.text
 
 
+def get_default_settings():
+    """Return default settings structure"""
+    return {
+        "strict": True,
+        "debug": True,
+        "sp": {},
+        "idp": {}
+    }
+
+
 def update_settings_json(idp_data, settings_file="settings.json"):
-    with open(settings_file, "r") as f:
-        settings = json.load(f)
+    # Create or load settings
+    if not os.path.exists(settings_file):
+        settings = get_default_settings()
+    else:
+        with open(settings_file, "r") as f:
+            settings = json.load(f)
 
     settings["idp"] = idp_data["idp"]
 
